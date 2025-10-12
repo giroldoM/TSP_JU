@@ -1,0 +1,842 @@
+% TARI29_Assignment_report_template.tex
+% This is a template for the assignment reports
+% TARI29 Artificial Intelligence, 7.5 credits, Winter 2024
+% Original version by:  Vladimir Tarasov, 2024
+% Revised by:           Alexandros Tzanetos, 2024 
+
+% Use a modern class instead of an old article class
+\documentclass{scrartcl}
+
+\KOMAoptions{
+    parskip=half,  % full, off
+    fontsize=12pt, % base font size (10pt default)
+    % headings=big,% small/normal/big headings (normal is default), 
+    % paper=a5,    % paper format (a4 default) 
+    pagesize=auto  % Use paper format for PDF too
+}
+
+% ---------------------- Report details --------------------- %
+\newcommand{\docauthor}{Filip Sjögren, Jesper Claesson, Joakim Möll, Murillo Moraes Giroldo, Sebastian Andersson}
+\newcommand{\courseyear}{2025}
+\newcommand{\coursename}{TARI29 Artificial Intelligence}
+\newcommand{\coursecredits}{7.5 credits}
+\newcommand{\fullcoursename}{\coursename, \coursecredits}
+\newcommand{\termname}{Winter \courseyear}
+\newcommand{\groupnumber}{\#8}
+\newcommand{\reportname}{Group \groupnumber\ Assignment Report}
+\newcommand{\assignmentname}{Evolutionary Computation Assignment}
+% ------------------ End of report details ------------------ %
+
+
+
+% ---------- Setting up properties of the PDF file ---------- %
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    allcolors=blue,
+  %  pdftitle={\reportname},
+    pdfauthor={Filip Sjögren, Jesper Claesson, Joakim Möll, Murillo Moraes Giroldo, Sebastian Andersson},
+   % pdfsubject={\coursename, \termname}
+	% pdfpagemode=FullScreen,
+	% pdfpagemode= UseOutlines % the default if present
+}
+% ------------ End of properties of the PDF file ------------ %
+
+
+
+% ----------- Setting up the headers and footers ------------ %
+\usepackage{scrlayer-scrpage}
+\pagestyle{scrheadings}
+\KOMAoptions{% 
+    headsepline,% line below the header
+    plainheadsepline,% also on scrplain
+}
+\clearscrheadfoot % Erase all current configurations
+% inner part of the header [titel_page]{other_pages}
+\ihead[\coursename, \courseyear]{\coursename, \courseyear}
+% outer part of the header [titel_page]{other_pages}
+\ohead{\assignmentname}
+% center part of the footer [titel_page]{other_pages}
+\cfoot[\textup{Page \pagemark\ of \ztotpages}]{\textup{Page \pagemark\ of \ztotpages}}
+% ------------- End of the headers and footers -------------- %
+
+
+
+% ---------------- Setting up the title page ---------------- %
+\title{\reportname}
+\subtitle{An Evolutionary Algorithm for the Travelling Salesman Problem}
+%\author{\docauthor}
+\author{Filip Sjögren\and Jesper Claesson\and Joakim Möll\and Murillo Moraes Giroldo\and Sebastian Andersson \and}
+\date{\today}
+% ------------------ End of the title page ------------------ %
+
+
+
+% --------------- Packages and custom commands -------------- %
+% Specify the input encoding of the source file as UTF8 
+\usepackage[utf8]{inputenc}
+% The T1 font encoding is an 8-bit encoding and fully supports words containing accented characters
+\usepackage[T1]{fontenc}
+% Load Latin modern fonts in outline format
+\usepackage{lmodern}
+% Load better typewriter font
+\usepackage{inconsolata}
+% For better hyphenation patterns
+\usepackage[english]{babel}
+% For improved micro-typography
+\usepackage{microtype}
+% Switch off extra space after a sentence
+\frenchspacing
+% To be able to iclude pictures
+\usepackage{graphicx}
+\usepackage{zref-totpages} % To get the total number of pages
+\usepackage{mathtools,amsmath} % for advanced math formulas
+ % To highlight source code
+\usepackage{minted}
+% Default options for all minted environments
+\setminted{
+           style=default, % for minted envronment
+           autogobble, % automatically remove all common leading whitespace
+           xleftmargin=10pt, % indentation to add (on the left) before the listing
+           numbersep=6pt, % gap between numbers and start of line
+           linenos, % enables line numbers
+           mathescape % enables the usual math mode inside comments
+}
+\setmintedinline[c]{style=default} % for minted inlines
+% Flexible handling of verbatim text
+\usepackage{fancyvrb}
+% For well-spaced lines and guidelines in tables
+\usepackage{booktabs}
+% To typeset algorithms or pseudocode in LaTeX 
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+% For plots and graphs
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.18}
+\usepackage{amsmath}
+ 
+
+
+% To generate placeholder text - can be deleted when you have written real text
+\usepackage{lipsum}
+% ----------- End of packages and custom commands ----------- %
+
+
+
+\begin{document}
+
+\maketitle
+
+% % It can be commented out if you do not want the table of contents
+% \tableofcontents 
+
+
+\section{Introduction}
+\label{sec:intro}
+
+This assignment, part of the course TARI29 – Artificial Intelligence, focuses on the study and practical implementation of algorithms inspired by evolutionary computation. The main objective is to design and evaluate a Genetic Algorithm (GA) capable of solving a combinatorial optimization problem. For this purpose, the well-known Travelling Salesman Problem (TSP) was selected as the test case due to its computational complexity and relevance in heuristic optimization research.
+
+The work involved implementing the core components of a GA, including population representation, fitness evaluation, selection, crossover,  mutation and analyzing how these evolutionary operators contribute to the algorithm’s ability to approximate optimal solutions. The algorithm was developed from scratch in Python, following an imperative programming paradigm, in accordance with the course requirements.
+
+The study aimed to evaluate the efficiency and robustness of the implemented GA across different experimental conditions. Although several parameters such as population size, mutation rate, and number of generations were explored, the focus of the project remained on understanding the underlying evolutionary process and assessing the algorithm’s capacity to adaptively search for high-quality solutions.
+
+By combining algorithmic design with empirical evaluation, this assignment provided a hands-on understanding of how evolutionary principles can be employed to tackle complex optimization problems where traditional exact methods become computationally infeasible.
+
+
+
+\section{Travelling Salesman Problem (TSP)}
+
+\label{sec:problem_description}
+
+\textbf{Problem.}
+Given a complete weighted graph \(G=(V,E)\) with \(|V|=n\) cities and distances \(d_{ij}\!\ge\!0\), the TSP seeks a minimum-length Hamiltonian cycle visiting each city exactly once and returning to the start. We encode a tour as a permutation \(\pi\) and evaluate it by
+\[
+f(\pi)=\sum_{k=1}^{n} d_{\pi_k,\,\pi_{(k \bmod n)+1}},
+\]
+which matches our implementation (closing the tour at the end). The combinatorial search space (\(n!\)) motivates heuristic methods.
+
+\textbf{Related evolutionary work (anchors).}
+In permutation-encoded TSP, problem-aware crossovers that preserve relative order are standard baselines; a common pattern is to copy a contiguous segment from one parent and fill remaining positions by the second parent’s order, ensuring a valid permutation without repair \cite{Hussain2017_CX2}. Tournament selection provides simple, tunable selection pressure controlled by the tournament size \(k\) \cite{MillerGoldberg1995_Tournament}. Classic mutation operators for permutations include \emph{swap}, \emph{insertion}, and \emph{inversion}; low mutation rates are recommended to preserve search focus \cite{Kumar2012_JGRCS_TSP_GA_Study}.
+
+\textbf{Motivation for our design.}
+Our goal is a clear, from-scratch GA aligned with these guidelines: path (permutation) representation with tour-length fitness; tournament selection (tunable pressure); an order-preserving two-cut crossover that yields valid tours without repair; and a lightweight \emph{swap} mutation for diversity \cite{Hussain2017_CX2,MillerGoldberg1995_Tournament,Kumar2012_JGRCS_TSP_GA_Study}.
+
+
+
+
+\section{Genetic Algorithm}
+\label{sec:algorithm}
+
+\subsection{Evolutionary Approach}
+The algorithm begins by initializing a population of $ num\_paths $ randomly generated solutions, which forms the starting point for the search. Through $ num\_generations $ iterations, the population evolves into optimized combinations of paths, gradually guiding the population towards solutions of higher fitness.
+
+In order to achieve balance between exploring new solutions while preserving and exploiting optimal candidates, the evolutionary algorithm proceeds through four key stages:
+
+\begin{itemize}
+    \item \textit{Tournament selection} - parents are chosen based on their fitness from the starting city, where the shorter routes have a better fitness
+    \item \textit{Crossover} - two parents are combined to produce a new offspring path. A random segment from one parent is copied, and the remaining cities are filled in the same order as they appear in the second parent
+    \item \textit{Mutation} - a small random change is applied to the route,  by swapping two cities. This helps prevent the algorithm from getting trapped in a local minima
+    \item \textit{Elitism} - a few of the best routes are directly copied to the next generation to ensure that the best solutions are preserved
+\end{itemize}
+
+This process continues until termination, and the latest solution for the algorithm will be the shortest path calculated. 
+% To adapt the GA to the TSP, all operators were modified to ensure that each route remains a valid permutation of all cities, always starting and ending at city indexed 0.
+
+\subsubsection{Tournament selection}
+
+Tournament selection was chosen for its efficiency and robustness when fitness
+values vary a lot across the population. This method picks $k$ individuals at
+random, and the winner is determined by the candidate with the best fitness (shortest
+route). This route wins the tournament and is chosen as a parent. The process
+is repeated to obtain two winners for a crossover. The parameter $k$ controls the
+selection pressure – a larger $k$ will increase the likelihood of selecting the fittest
+individuals, while a smaller $k$ promotes more diversity, increasing the likelihood of
+varied fitness levels in participants.
+
+To validate this choice, we compared the algorithm's performance over 100 runs 
+with tournament selection ($k=5$) and 100 runs without it, using random parent selection.  
+The version with tournament selection achieved a much lower mean best distance 
+(\textbf{9,123}) compared to the random-parent version (\textbf{15,724}), while the known optimum 
+for the Berlin52 problem is \textbf{7,542}.  
+These results confirm that the tournament approach provides a better balance between 
+selective pressure and population diversity, justifying its use in all subsequent experiments.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+  \begin{axis}[
+    width=0.8\textwidth, height=6.2cm,
+    xlabel={Selection method},
+    ylabel={Mean best distance (100 runs)},
+    ymajorgrids, grid=both,
+    symbolic x coords={Tournament (k=5),Random parents},
+    xtick=data,
+    enlarge x limits=0.25,
+    ymin=7000,
+    scaled y ticks=false,
+    yticklabel style={
+      /pgf/number format/.cd, fixed, precision=0, 1000 sep={,}
+    },
+    nodes near coords,
+    nodes near coords align={vertical},
+    every node near coord/.append style={
+      font=\footnotesize,
+      /pgf/number format/.cd, fixed, precision=0, 1000 sep={,}
+    },
+  ]
+
+  % Bars
+  \addplot+[
+    ybar, bar width=20pt, draw=black, fill=blue!35,
+    point meta=y
+  ] coordinates {
+    (Tournament (k=5), 9123)
+    (Random parents,   15724)
+  };
+
+  % Optimal line
+  \addplot+[black, dashed, thick] coordinates {
+    (Tournament (k=5), 7542)
+    (Random parents,   7542)
+  };
+
+  \end{axis}
+  \end{tikzpicture}
+  \caption{Comparison between tournament selection ($k=5$) and random parent selection over 100 runs. The dashed line marks the Berlin52 optimum (7,542).}
+  \label{fig:tournament_selection}
+\end{figure}
+
+
+
+
+
+
+\subsubsection{Crossover}
+The crossover operator is based on a segment method where a continous part of one parent's route is copied directly into the child, the remaining cities are filled from the second parent, in the same \textbf{relative order}. This approach ensures that the child represents a valid TSP route where each city only appears once. Note that city~0 remains fixed at the beginning of the route to maintain a valid trip.
+
+Visualization of order crossover with size $n = 7$:
+
+\begin{center}
+\begin{tabbing}
+\hspace{6cm}\=\kill
+\textbf{Parent 1:} \> $[0, 3, 1, 2, 5, 4, 6]$ \\
+\textbf{Parent 2:} \> $[0, 2, 1, 5, 4, 3, 6]$ \\
+\textbf{Segment from parent 1:} \> $[0, 3, 1, \textbf{2,5,4}, 6]$ \\
+\textbf{Fill with remaining:} \> $[0, \textbf{1}, \textbf{3}, 2, 5, 4, \textbf{6}]$
+\end{tabbing}
+\end{center}
+
+% Pseudo code of the order crossover:
+% 
+% \begin{algorithm}[H]
+% \caption{Crossover}\label{alg:crossover}
+% \begin{algorithmic}
+% \State $size = len(path1)$
+% \newline
+% \State $r1 \gets random(1, size-1)$
+% \State $r2 \gets random(1, size-1)$
+% \newline
+% \State $start \gets min(r1, r2)$
+% \State $end \gets max(r1, r2)$
+% \newline
+% \State $new\_path[start:end] \gets path1[start:end]$
+% \newline
+% \State $i \gets 0$
+% \State $pointer \gets 0$
+% \While{$i < size$}
+% \If{$new\_path[i]$ is NULL}
+%     \While{$path2[pointer]$ in $new\_path$}
+%     \State $pointer \gets pointer + 1$
+%     \EndWhile
+%     \newline
+%     \State $new\_path[i] \gets path2[pointer]$
+%     \State $pointer \gets pointer + 1$
+% \EndIf
+% \EndWhile
+% \newline
+% \State \textbf{return $new\_path$}
+% \end{algorithmic}
+% \end{algorithm}
+
+% def crossover(path1, path2):
+%     size = len(path1)
+%     start, end = sorted(random.sample(range(1, size), 2)) # Select two crossover points
+%     new_path = [None] * size
+%     new_path[start:end] = path1[start:end] # Copy a segment from the first parent
+% 
+%     pointer = 0
+%     for i in range(size):
+%         if new_path[i] is None: # Fill in the remaining positions with genes from the second parent
+%             while path2[pointer] in new_path:
+%                 pointer += 1
+%             new_path[i] = path2[pointer]
+%             pointer += 1
+% 
+%     return new_path 
+
+
+% $$ p1 = [2, 3, 6, 1, 4, 5] $$
+% $$ p2 = [3, 5, 2, 1, 6, 4] $$
+% $$ s1 = [2, \textbf{3}, \textbf{6}, \textbf{1}, 4, 5] $$
+% $$ s2 = [\textbf{5}, 3, 6, 1, \textbf{2}, \textbf{4}] $$
+
+\subsubsection{Mutation}
+The mutation operator introduces small random changes in the routes to maintain diversity within the population and prevent the algorithm from converging too early to a suboptiomal solution. In this case we used a simple but effective \textit{swap mutation}. This method selects two cities by random and swaps their positions with a probability $p_m$. This makes the algorithm explore new areas of the search space without interfering the overall structure of the route. This simple method gives the algorithm just enough variation to help the population escape a local minima point.
+
+% The city indexed 0 is never mutated to make sure that every route is valid since it always represent both the start and end point of our route.
+
+% \begin{algorithm}[H]
+% \caption{Mutate}\label{alg:pseudocode_example}
+% \begin{algorithmic}
+% \State $size = len(path)$
+% \State $i = 1$
+% \newline
+% \While{$i \leq size$}
+% \State $r = random\_probability(1, size-1)$
+% \newline
+% \If{$r \leq mutation\_rate$}
+%     \State $swap(path[i], path[r])$
+%     \State $i \gets i + 1$
+% \EndIf
+% \EndWhile
+% \newline
+% \State \textbf{return path}
+% \end{algorithmic}
+% \end{algorithm}
+
+\subsubsection{Elitism}
+The elitist approach is included to ensure that the best solution found so far is not lost in the next generation. At the end of each generation, $num\_best$ top-preforming routes, called \textit{elites}, are copied directly into the new population without any modification. This guarantees that the overall quality of the population never decreases from one generation to another. The use of elitism helps the algorithm converge \textbf{faster} towards better solutions, strong individuals are always preserved and allowed to influence next generations.
+
+\subsection{The Final Algorithm: Pseudo Code}
+
+The following pseudo code presents the complete version of the proposed algorithm, combining the critical stages described in the previous sections.
+
+% \begin{algorithm}[H]
+% \caption{Genetic Algorithm}\label{alg:complete}
+% \begin{algorithmic}
+% \State $paths = random\_paths(size, num\_paths)$
+% \State $i \gets 0$
+% \While{$i < num\_generations$}
+% \State $best\_paths = select\_best\_paths(paths, distance\_matrix, num\_best)$
+% \State $new\_paths \gets copy(best\_paths)$
+% \newline
+% \While{$|new\_paths| < num\_paths$}
+% \State $parent\_1 \gets tournament\_select(paths, distance\_matrix, k\_tournaments)$
+% \State $parent\_2 \gets tournament\_select(paths, distance\_matrix, k\_tournaments)$
+% \State $attempts \gets 0$
+% \newline
+% \While{$parent\_2$ is $parent\_1$ and $attempts < 3$}
+% \State $parent\_2 \gets tournament\_select(paths, distance\_matrix, k\_tournaments)$
+% \State $attempts \gets attempts + 1$
+% \EndWhile
+% \newline
+% \State $child \gets crossover(parent\_1, parent\_2)$
+% \State $child \gets mutate(child, mutation\_rate)$
+% \State append($new\_paths, child)$
+% \EndWhile
+% \newline
+% \State $paths \gets new\_paths$
+% \State $i \gets i + 1$
+% \EndWhile
+% \end{algorithmic}
+% \end{algorithm}
+
+
+\begin{algorithm}[H]
+\caption{Genetic Algorithm}\label{alg:complete}
+\begin{algorithmic}
+\State $paths = init\_popuation(size, num\_paths)$
+\newline
+\State $i \gets 0$
+\While{$i < num\_generations$}
+\newline
+\State $best\_paths = select\_best\_paths(paths, matrix, num\_best)$
+\State $new\_paths \gets copy(best\_paths)$
+\newline
+\While{$|new\_paths| < num\_paths$}
+\newline
+\State $parent\_1 \gets tournament(paths, matrix, k\_tournaments)$
+\State $parent\_2 \gets tournament(paths, matrix, k\_tournaments)$
+\newline
+\State $attempts \gets 0$
+\While{$parent\_2$ is $parent\_1$ and $attempts < 3$}
+\newline
+\State $parent\_2 \gets tournament\_select(paths, matrix, k\_tournaments)$
+\State $attempts \gets attempts + 1$
+\newline
+\EndWhile
+\newline
+\State $child \gets crossover(parent\_1, parent\_2)$
+\State $child \gets mutate(child, mutation\_rate)$
+\State append($new\_paths, child)$
+\newline
+\EndWhile
+\newline
+\State $paths \gets new\_paths$
+\State $i \gets i + 1$
+\newline
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Solution representation}
+\subsubsection{Candidates}
+The candidate solutions are represented as an ordered sequence of city indices, where two consecutive indices correspond to a distance defined in an adjacency matrix of pairwise distances. For example, candidate $[0, 3, 1, 2, 5, 4, 6]$ represents a possible tour visiting cities in that order, and $matrix[0][3]$ represents the distance between city 0 and city 3. 
+
+As the optimal solution to the TSP presume a visit to every city \textit{once}, the representation of each candidate is a permutation of indices ranging from $0$ to $cities-1$. Each population consists of $num\_path$ candidate solutions.
+
+The genetic operations crossover and mutation are applied directly on the candidates, while the tournament selection evaluates the candidates based on their total tour distance, derived from the adjacency matrix. To preserve only valid solutions using the same starting point, the city indexed 0 is never modified. Therefore, no crossover or mutation is performed on this index.
+
+\subsubsection{Output}
+All the individuals in the population represents a complete route visiting all cities exactly one time. This makes the representation implemented as a permutation of city indices where each gene corresponds to a city. 
+City 0 is fixed as both start and ending point which ensures that every solution presented forms a valid trip around all cities.
+
+The final solution is presented like this :
+ \begin{itemize}
+    \item \textbf{Best path:} $[p_0, p_1, p_2, \dots, p_n, p_0]$
+    \item \textbf{Best distance:} $F_{\text{min}}$
+    \item \textbf{Optimal distance (reference):} $F^*$
+    \item \textbf{Number of cities visited:} $n$
+ \end{itemize}
+
+\subsection{Fitness function}
+The quality of each route is determined by using a fitness function that measures its total distance traveled. The objective of the TSP is to minimize the total distance of the trip, meaning that shorter routes are considered better. During selection and elitism, individuals with lower total distances are preferred since they represent more optimal solutions. The total distance is calculated by summing the distances between consecutive cities in the route, including the return to the starting city.
+This approach keeps the evaluation simple and ensures that every route can easily be compared based on how efficiently it connects all of the population.
+
+\begin{equation}
+    F_{min} = \sum_{i=0}^{n-1} d(p_i, p_{(i+1)})
+\end{equation}
+where $p_i$ represents the $i$-th city in the route and $d(p_i, p_j)$ is the distance between city $i$ and city $j$. The goal of the algorithm is to minimize $F_{min}$, i.e., to find the route $P^*$ that yields the shortest possible total distance.
+
+
+\section{Experimental part}
+\label{sec:experimentation}
+
+
+\subsection{Hardware and Software}
+All experiments were executed locally by group members on heterogeneous personal machines
+(CPU/RAM/GPU vary across participants). To ensure software consistency, every run used
+Python~3.12.1 from within VS~Code (stable channel) with the same codebase and configuration files.
+The implementation relies on the Python standard library plus NumPy and Pandas for data handling;
+plots were produced with PGFPlots.
+
+Because hardware differs across contributors, all quality metrics (best, median, std of tour length)
+are hardware-agnostic. Wall-clock time should be interpreted as indicative only and not used for
+fine-grained cross-machine comparisons. When reporting compute effort, we therefore also reference
+a hardware-independent proxy, the number of fitness evaluations:
+\[
+\text{evals} \;=\; (\texttt{num\_paths}) \times (\texttt{num\_generations})
+\quad\text{(per run, ignoring elitism).}
+\]
+Unless otherwise stated, each configuration was run with multiple independent random seeds to
+capture stochastic variability.
+
+\subsection{Datasets}
+We used symmetric, Euclidean TSPLIB instances: \texttt{ulysses16}, \texttt{bays29}, \texttt{berlin52}, and \texttt{eil76}.
+Distances are computed from coordinates using standard Euclidean metric without rounding.
+For each instance we report the best-known optimum $F^\*$ and the percentage gap of our best and median solutions:
+$\mathrm{gap}(\%) = 100 \times (F_{\mathrm{GA}} - F^\*)/F^\*$.
+
+\subsection{Parameter Tuning and Sensitivity Analysis}
+\label{subsec:paramtuning}
+
+Before evaluating the final performance of the Genetic Algorithm (GA), an additional experiment was conducted to calibrate its main hyperparameters.  
+This tuning stage aimed to determine a configuration that offered a good balance between solution quality, runtime, and consistency across multiple executions.  
+Given the stochastic nature of evolutionary algorithms, this calibration was crucial to ensure that the chosen parameter set produced reliable and reproducible results.
+
+\vspace{0.3cm}
+\noindent\textbf{Experimental setup.}  
+Five key parameters were varied systematically:
+\begin{itemize}
+    \item \textbf{Mutation rate:} 1\%, 3\%, 5\%, 8\%, and 10\%
+    \item \textbf{Population size:} 100, 250, and 400 individuals
+    \item \textbf{Number of generations:} 500, 1000, and 2000
+    \item \textbf{Number of elites (\textit{num\_best}):} 2 and 4
+    \item \textbf{Tournament size (\textit{k\_tournament}):} 3, 5, and 7
+\end{itemize}
+
+All possible combinations of these parameters were tested, resulting in a total of 270 unique configurations.  
+Each configuration was executed ten times using different random seeds to account for stochastic variability, leading to a total of 2,700 independent runs.  
+For each run, the algorithm recorded the best distance obtained and the corresponding runtime.  
+After execution, results were aggregated into summary statistics including the mean, median, and standard deviation of the best distances per configuration.  
+The analysis focused not only on minimizing the mean distance, but also on identifying stable configurations with low variability and reasonable computational cost.
+
+\vspace{0.3cm}
+\noindent\textbf{Results.}  
+Figure~\ref{fig:mutation_rate} illustrates the influence of the mutation rate on the mean best distance, with all other parameters fixed.  
+The lowest mean distance was obtained with a mutation rate of 1\%, indicating that a small degree of random variation is sufficient to preserve population diversity without disrupting convergence.  
+Higher mutation rates (above 5\%) consistently degraded performance, likely due to excessive randomization in the population.
+
+
+
+\begin{figure}[H] 
+  \centering
+
+  \begin{tikzpicture}
+  \begin{axis}[
+    width=0.8\textwidth, height=6.2cm, % ajuste fino opcional
+    xlabel={Mutation rate}, ylabel={Mean distance},
+    error bars/.cd, y dir=both, y explicit,
+    bar width=6pt, ymajorgrids, unbounded coords=jump,
+    xtick={0.01,0.03,0.05,0.08,0.1},
+    xticklabels={1\%, 3\%, 5\%, 8\%, 10\%},
+    tick label style={/pgf/number format/fixed}
+]
+    \pgfplotstableread[col sep=comma]{csvslimpos/pgf_fig1_mutation.csv}\dataA
+    \addplot+[ybar, fill=blue!35]
+      table[x=mutation_rate,y=mean,y error=err]{\dataA};
+  \end{axis}
+  \end{tikzpicture}
+  \caption{Effect of mutation rate on the mean best distance (error bars show one std).}
+  \label{fig:mutation_rate}
+\end{figure}
+
+
+
+
+
+
+Figure~\ref{fig:population_size} presents the effect of population size on the mean best distance, with error bars representing one standard deviation.  
+Larger populations led to better results and smaller variance, confirming that maintaining genetic diversity enhances exploration and prevents premature convergence.  
+Among the tested values, a population size of 400 individuals produced the best average distance with the lowest variability.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+  \begin{axis}[
+    width=0.8\textwidth, height=6.2cm,
+    xlabel={Population size}, ylabel={Mean distance},
+    ymajorgrids,
+    bar width=10pt,
+    xmin=50, xmax=450, % só pra dar margem nas bordas
+    xtick={100,250,400},
+    xticklabels={100, 250, 400},
+    error bars/.cd, y dir=both, y explicit,
+    error bar style={line width=0.7pt},
+    error mark options={rotate=90, mark size=1.5pt},
+  ]
+
+  % Barras com erro (± std), dados embutidos:
+  \addplot+[
+    ybar, fill=green!40,
+    error bars/.cd, y dir=both, y explicit,
+  ] coordinates {
+    (100, 9957.90) +- (0, 455.95)
+    (250, 9474.07) +- (0, 435.34)
+    (400, 8980.47) +- (0, 338.32)
+  };
+
+  \end{axis}
+  \end{tikzpicture}
+  \caption{Effect of population size on the mean best distance (error bars show one standard deviation). A population of 400 individuals achieved the best performance and the lowest variability.}
+  \label{fig:population_size}
+\end{figure}
+
+
+
+
+Figure~\ref{fig:runtime_tradeoff} explores the trade-off between runtime and solution quality.  
+The Y-axis represents the mean best distance, while the X-axis shows the mean runtime in seconds.  
+Data points are color-coded by population size (red = 100, blue = 250, green = 400), and different markers denote the number of generations (diamonds = 500, squares = 1000, triangles = 2000).  
+The plot reveals two clear trends: increasing population size consistently improves the quality of solutions, while increasing the number of generations beyond 1000 yields diminishing returns.  
+Specifically, for a population of 400, the mean best distance improved marginally from approximately 8950 at 1000 generations to around 8800 at 2000 generations, whereas the runtime more than doubled.  
+Thus, the additional computational cost was not justified by the small performance gain.
+
+\begin{figure}[H]
+  \centering
+  
+  \begin{tikzpicture}
+  \begin{axis}[
+      width=0.85\textwidth,
+      height=6.5cm,
+      xlabel={Mean runtime (s)},
+      ylabel={Mean distance},
+      legend style={
+          at={(1.02,0.5)},
+          anchor=west,
+          draw=none,
+          fill=none,
+          font=\small,
+          row sep=2pt
+      },
+      legend cell align=left,
+      clip=false,
+      scaled y ticks=false,
+      every mark/.style={},
+  ]
+
+  \addplot+[black, dotted, thin, forget plot] coordinates {(1.73,10050) (4.3,9660) (6.9,9110)};
+  \addplot+[black, dotted, thin, forget plot] coordinates {(3.5,9960) (8.7,9415) (14.1,8950)};
+  \addplot+[black, dotted, thin, forget plot] coordinates {(6.7,9800) (17,9345) (28,8800)};
+
+  % DIAMONDS (gen=500)
+  \addplot+[only marks, mark=diamond*, mark size=3pt, forget plot,
+            mark options={fill=red,  draw=black}] coordinates {(1.73,10050)};
+  \addplot+[only marks, mark=diamond*, mark size=3pt, forget plot,
+            mark options={fill=blue, draw=black}] coordinates {(4.3,9660)};
+  \addplot+[only marks, mark=diamond*, mark size=3pt, forget plot,
+            mark options={fill=green,draw=black}] coordinates {(6.9,9110)};
+
+  % SQUARES (gen=1000)
+  \addplot+[only marks, mark=square*, mark size=3pt, forget plot,
+            mark options={fill=red,  draw=black}] coordinates {(3.5,9960)};
+  \addplot+[only marks, mark=square*, mark size=3pt, forget plot,
+            mark options={fill=blue, draw=black}] coordinates {(8.7,9415)};
+  \addplot+[only marks, mark=square*, mark size=3pt, forget plot,
+            mark options={fill=green,draw=black}] coordinates {(14.1,8950)};
+
+  % TRIANGLES (gen=2000)
+  \addplot+[only marks, mark=triangle*, mark size=3pt, forget plot,
+            mark options={fill=red,  draw=black}] coordinates {(6.7,9800)};
+  \addplot+[only marks, mark=triangle*, mark size=3pt, forget plot,
+            mark options={fill=blue, draw=black}] coordinates {(17,9345)};
+  \addplot+[only marks, mark=triangle*, mark size=3pt, forget plot,
+            mark options={fill=green,draw=black}] coordinates {(28,8800)};
+
+  % Legends
+  \addlegendimage{empty legend}
+  \addlegendentry{\textbf{forms:}}
+  \addlegendimage{only marks, mark=diamond*, mark size=3pt, mark options={fill=black,draw=black}}
+  \addlegendentry{gen = 500}
+  \addlegendimage{only marks, mark=square*,  mark size=3pt, mark options={fill=black,draw=black}}
+  \addlegendentry{gen = 1000}
+  \addlegendimage{only marks, mark=triangle*, mark size=3pt, mark options={fill=black,draw=black}}
+  \addlegendentry{gen = 2000}
+
+  \addlegendimage{empty legend}
+  \addlegendentry{\textbf{colors:}}
+  \addlegendimage{only marks, mark=*, mark size=3pt, mark options={fill=red,  draw=black}}
+  \addlegendentry{pop = 100}
+  \addlegendimage{only marks, mark=*, mark size=3pt, mark options={fill=blue, draw=black}}
+  \addlegendentry{pop = 250}
+  \addlegendimage{only marks, mark=*, mark size=3pt, mark options={fill=green,draw=black}}
+  \addlegendentry{pop = 400}
+
+  \end{axis}
+  \end{tikzpicture}
+
+  \caption{Trade-off between mean runtime and solution quality.  
+  Colors represent population size (red = 100, blue = 250, green = 400), and markers denote number of generations (diamonds = 500, squares = 1000, triangles = 2000).  
+  The results indicate diminishing returns beyond 1000 generations.}
+  \label{fig:runtime_tradeoff}
+\end{figure}
+
+
+\vspace{0.3cm}
+\noindent\textbf{Selected configuration.}  
+Based on these experiments, the configuration
+\[
+\begin{aligned}
+\texttt{mutation\_rate} &= 0.01, \\
+\texttt{num\_paths} &= 400, \\
+\texttt{num\_generations} &= 1000, \\
+\texttt{num\_best} &= 4, \\
+\texttt{k\_tournament} &= 5
+\end{aligned}
+\]
+was selected as the final setup.
+
+This parameter set achieves a strong compromise between accuracy, stability, and computational efficiency.  
+It was subsequently used in all remaining experiments to evaluate the final performance of the Genetic Algorithm.
+
+
+
+\section{Results and Analysis}
+\label{sec:results-analysis}
+
+
+
+\textcolor{black}{
+This section presents the experimental results obtained from the developed Genetic Algorithm and analyzes its performance in solving the Travelling Salesman Problem. 
+The analysis includes a comparison with a baseline algorithm, an evaluation of consistency across multiple runs, and an examination of the algorithm’s convergence behavior over generations.
+}
+
+\subsection{Baseline Comparison with Prim’s Algorithm}
+
+\textcolor{black}{To provide a reference point for evaluating the Genetic Algorithm, Prim's algorithm is introduced to construct a Minimum Spanning Tree over the set of cities, from which a tour was created by traversing the MST. Although this approach does not guarantee optimality, it offers a computationally efficient solution that can be used for comparison of the GA's performance.}
+
+\textcolor{black}{Table~\ref{tab:results_example} presents the results obtained for several different TSP instances. Both the GA and Prim’s algorithm were executed under identical conditions, and as shown in the table, the GA consistently outperformed the baseline across all test cases, achieving tour lengths much closer to the known optima.}
+
+\begin{table}[h]
+\centering
+\caption{Comparison of Genetic Algorihm performance against Prim's algorithm and known optima.}
+\label{tab:results_example}
+	\begin{tabular}{lrrrr}
+	\toprule
+	\textbf{Instance} & \textbf{Optimum} & \textbf{GA} & \textbf{Baseline} & \textbf{time (s)}\\
+	\midrule
+	ulysses16   &  6859      & 6972	& 7788  & 6.97   \\
+	bays29      &  2020      & 2164	& 2677  & 10.79  \\
+	berlin52    &  7452      & 8626	& 10402 & 20.96  \\
+	eil76       &  538       & 630	& 731   & 30.52  \\
+	\bottomrule
+	\end{tabular}
+\end{table}
+
+\textcolor{black}{Besides confirming the superiority of the Genetic Algorithm over Prim's algorithm, the results in Table 1 reveal additional patterns. As the problem size increased, the runtime grew approximately linearly, while the relative deviation from the optima increased mildly. This indicates that the GA scales efficiently across multiple TSP instances and maintains strong performance even as the search space expands.}
+
+\subsection{Evaluation Of Consistency}
+\textcolor{black}{
+To further evaluate the accuracy and consistency of the developed Genetic Algorithm, we analyzed its performance across 25 independent runs for each TSP instance. 
+For each instance, the median best tour length was computed and compared with the known optimal solution. 
+Figure~\ref{fig:median} illustrates this comparison, showing how closely the GA approximates the optimal tour while maintaining stability across repeated executions.
+}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    width=0.8\textwidth,
+    height=6.5cm,
+    ybar,
+    bar width=10pt,
+    xlabel={TSP Instance},
+    ylabel={Tour Distance},
+    symbolic x coords={ulysses16,bays29,berlin52,eil76},
+    xtick=data,
+    ymajorgrids=true,
+    legend style={
+        at={(0.5,1.05)},
+        anchor=south,
+        legend columns=-1,
+        font=\small
+    },
+    error bars/.cd, y dir=both, y explicit,
+]
+
+\addplot+[fill=gray!40] coordinates {
+    (ulysses16,6859)
+    (bays29,2020)
+    (berlin52,7452)
+    (eil76,538)
+};
+
+\addplot+[fill=blue!45, error bars/.cd, y dir=both, y explicit] coordinates {
+    (ulysses16,6900.04) +- (0,29)
+    (bays29,2215.80) +- (0,14)
+    (berlin52,8905.52) +- (0,28)
+    (eil76,701.36)    +- (0,48)
+};
+
+\addlegendimage{ybar,fill=gray!40,draw=black}
+\addlegendentry{Optimum}
+\addlegendimage{ybar,fill=blue!45,draw=black}
+\addlegendentry{GA (median of 25 runs)}
+\end{axis}
+\end{tikzpicture}
+\caption{median}
+\label{fig:median}
+\end{figure}
+
+
+\textcolor{black}{As shown in Figure~\ref{fig:median}, the Genetic Algorithm produced tour lengths consistently close to the known optima for all tested instances. 
+The gap between the GA results and the optimal solutions remained small, indicating that the algorithm reliably converges toward high-quality solutions even under stochastic variation. 
+Larger instances, such as \textit{berlin52} and \textit{eil76}, showed slightly higher deviations, which is expected given their larger search spaces and greater combinatorial complexity.
+Overall, these results demonstrate that the GA scales well with problem size while preserving solution quality.}
+
+\subsection{Convergence Behavior}
+\textcolor{black}{To better understand the convergence behavior of the GA, we tracked how the tour length successively evolved over generations. Figure~\ref{fig:convergence} illustrates three independent runs of the GA on the same TSP instance. The goal of this analysis is to observe whether the algorithm consistently converges toward high-quality solutions and how the rate of improvement changes over time.}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+    % title={Example of convergence analysis},
+    xlabel={Generation},
+    ylabel={Fitness function value},
+    xmin=0, xmax=300,
+    ymin=7500, ymax=30000,
+    xtick={0,50,100,150,200, 250, 300},
+    ytick={7500,10000,12500,15000,17500,20000, 22500, 25000, 27500, 30000},
+    legend pos=north east,
+    ymajorgrids=true,
+    grid style=dashed,
+]
+\addplot[
+    color=blue,
+    mark=square,
+    ]
+    coordinates {
+    (0,23560)(20,14791)(40,11010)(60,10259)(80,9542)(100,9374)(120,9336)(140,9336)(160,9336)(180,9336)(200,9336)(220,9336)(240,9336)(260,9336)(280,9268)(300,9265)
+    };
+    \addlegendentry{Run1}
+
+\addplot[
+    color=red,
+    mark=triangle,
+    ]
+    coordinates {
+    (0,24205)(20,14258)(40,11421)(60,10418)(80,9568)(100,9146)(120,9096)(140,9096)(160,9096)(180,9096)(200,8996)(220,8996)(240,8996)(260,8996)(280,8996)(300,8991)
+    };
+    \addlegendentry{Run2}
+
+\addplot[
+    color=green,
+    mark=diamond,
+    ]
+    coordinates {
+    (0,24045)(20,16478)(40,12670)(60,11222)(80,10187)(100,9493)(120,9439)(140,8940)(160,8866)(180,8861)(200,8861)(220,8861)(240,8861)(260,8861)(280,8861)(300,8861)
+    };
+    \addlegendentry{Run3}
+  
+\end{axis}
+\end{tikzpicture}
+\caption{Example of convergence analysis.}
+\label{fig:convergence}
+\end{figure}
+
+\textcolor{black}{As shown in Figure~\ref{fig:convergence}, all three runs displays a rapid improvement in solution quality during early generations, followed by a stabilization phase after approximately 100-150 generations. This behavior indicates that the GA quickly explores the search space and converges toward high-quality solutions within a relatively small amount of iterations. Overall, this shows a good balance between in the parameter setup.}
+
+\section{Conclusions}
+\label{sec:conclusions}
+
+\textcolor{black}{In this study, a Genetic Algorithm (GA) was designed and implemented to evaluate its performance in optimizing the Travelling Salesman Problem (TSP). The main goal was to understand how evolutionary principles such as selection, crossover, mutation, and elitism can be used to find near-optimal solutions to complex optimization problems.}
+
+\textcolor{black}{Through several experiments and parameter tuning, the algorithm demonstrated strong performance across multiple TSP instances, consistently producing high-quality routes with reasonable computational cost. As shown in Table~\ref{tab:results_example}, the GA compared to the baseline Prim’s algorithm consistently generated shorter tour lengths while maintaining reasonable runtimes. The final configuration also achieved stable results over multiple runs, as illustrated in Figure~\ref{fig:median}, showing the algorithm's reliability and robustness.}
+
+\textcolor{black}{If this study were to be continued, some possible directions for improvement include implementing dynamic population sizes depending on the problem size to improve efficiency, exploring more problem-specific crossover functions and tournament selection (such as roulette), and applying adaptive mutation rates.}
+
+\bibliographystyle{ieeetr}
+\bibliography{references}
+
+\end{document}
