@@ -1,0 +1,81 @@
+\documentclass[border=2pt]{standalone}
+\usepackage{pgfplots,xcolor}
+\pgfplotsset{compat=1.18}
+\begin{document}
+
+
+
+\begin{tikzpicture}
+\begin{axis}[
+    width=9.5cm,
+    height=6cm,
+    xlabel={Mean runtime (s)},
+    ylabel={Mean distance},
+    legend style={
+        at={(1.02,0.5)},
+        anchor=west,
+        draw=none,
+        fill=none,
+        font=\small,
+        row sep=2pt
+    },
+    legend cell align=left,
+    clip=false,
+    scaled y ticks=false,
+    every mark/.style={},
+]
+
+
+\addplot+[black, dotted, thin, forget plot] coordinates {(1.73,10050) (4.3,9660) (6.9,9110)};
+\addplot+[black, dotted, thin, forget plot] coordinates {(3.5,9960) (8.7,9415) (14.1,8950)};
+\addplot+[black, dotted, thin, forget plot] coordinates {(6.7,9800) (17,9345) (28,8800)};
+
+% Marcadores — DIAMANTE (gen=500)
+\addplot+[only marks, mark=diamond*, mark size=3pt, forget plot,
+          mark options={fill=red,  draw=black}] coordinates {(1.73,10050)};
+\addplot+[only marks, mark=diamond*, mark size=3pt, forget plot,
+          mark options={fill=blue, draw=black}] coordinates {(4.3,9660)};
+\addplot+[only marks, mark=diamond*, mark size=3pt, forget plot,
+          mark options={fill=green,draw=black}] coordinates {(6.9,9110)};
+
+% QUADRADO (gen=1000)
+\addplot+[only marks, mark=square*, mark size=3pt, forget plot,
+          mark options={fill=red,  draw=black}] coordinates {(3.5,9960)};
+\addplot+[only marks, mark=square*, mark size=3pt, forget plot,
+          mark options={fill=blue, draw=black}] coordinates {(8.7,9415)};
+\addplot+[only marks, mark=square*, mark size=3pt, forget plot,
+          mark options={fill=green,draw=black}] coordinates {(14.1,8950)};
+
+% TRIÂNGULO (gen=2000)
+\addplot+[only marks, mark=triangle*, mark size=3pt, forget plot,
+          mark options={fill=red,  draw=black}] coordinates {(6.7,9800)};
+\addplot+[only marks, mark=triangle*, mark size=3pt, forget plot,
+          mark options={fill=blue, draw=black}] coordinates {(17,9345)};
+\addplot+[only marks, mark=triangle*, mark size=3pt, forget plot,
+          mark options={fill=green,draw=black}] coordinates {(28,8800)};
+
+% Legenda (formas)
+\addlegendimage{empty legend}
+\addlegendentry{\textbf{forms:}}
+\addlegendimage{only marks, mark=diamond*, mark size=3pt, mark options={fill=black,draw=black}}
+\addlegendentry{gen = 500}
+\addlegendimage{only marks, mark=square*,  mark size=3pt, mark options={fill=black,draw=black}}
+\addlegendentry{gen = 1000}
+\addlegendimage{only marks, mark=triangle*, mark size=3pt, mark options={fill=black,draw=black}}
+\addlegendentry{gen = 2000}
+
+% Legenda (cores)
+\addlegendimage{empty legend}
+\addlegendentry{\textbf{colors:}}
+\addlegendimage{only marks, mark=*, mark size=3pt, mark options={fill=red,  draw=black}}
+\addlegendentry{pop = 100}
+\addlegendimage{only marks, mark=*, mark size=3pt, mark options={fill=blue, draw=black}}
+\addlegendentry{pop = 250}
+\addlegendimage{only marks, mark=*, mark size=3pt, mark options={fill=green,draw=black}}
+\addlegendentry{pop = 400}
+
+\end{axis}
+\end{tikzpicture}
+
+
+\end{document}
