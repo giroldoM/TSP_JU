@@ -1,0 +1,87 @@
+Iniciando Benchmark: 2026-03-23 19:54:57.630824
+Starting genetic algorithm with 400 paths for 1000 generations...
+Problem size: 52 cities
+--------------------------------------------------
+Generation    0: Best distance = 23908.00
+Generation  100: Best distance = 9178.00
+Generation  200: Best distance = 8493.00
+Generation  300: Best distance = 8493.00
+Generation  400: Best distance = 8493.00
+Generation  500: Best distance = 8493.00
+Generation  600: Best distance = 8493.00
+Generation  700: Best distance = 8493.00
+Generation  800: Best distance = 8493.00
+Generation  900: Best distance = 8493.00
+Generation  999: Best distance = 8493.00
+Execução 1 concluída.
+Starting genetic algorithm with 400 paths for 1000 generations...
+Problem size: 52 cities
+--------------------------------------------------
+Generation    0: Best distance = 23597.00
+Generation  100: Best distance = 8633.00
+Generation  200: Best distance = 8166.00
+Generation  300: Best distance = 8166.00
+Generation  400: Best distance = 8166.00
+Generation  500: Best distance = 8166.00
+Generation  600: Best distance = 8166.00
+Generation  700: Best distance = 8166.00
+Generation  800: Best distance = 8166.00
+Generation  900: Best distance = 8166.00
+Generation  999: Best distance = 8166.00
+Execução 2 concluída.
+Starting genetic algorithm with 400 paths for 1000 generations...
+Problem size: 52 cities
+--------------------------------------------------
+Generation    0: Best distance = 24651.00
+Generation  100: Best distance = 10855.00
+Generation  200: Best distance = 10202.00
+Generation  300: Best distance = 10044.00
+Generation  400: Best distance = 10044.00
+Generation  500: Best distance = 10021.00
+Generation  600: Best distance = 9972.00
+Generation  700: Best distance = 9960.00
+Generation  800: Best distance = 9960.00
+Generation  900: Best distance = 9960.00
+Generation  999: Best distance = 9960.00
+Execução 3 concluída.
+Starting genetic algorithm with 400 paths for 1000 generations...
+Problem size: 52 cities
+--------------------------------------------------
+Generation    0: Best distance = 21844.00
+Generation  100: Best distance = 9461.00
+Generation  200: Best distance = 9324.00
+Generation  300: Best distance = 9324.00
+Generation  400: Best distance = 9324.00
+Generation  500: Best distance = 9324.00
+Generation  600: Best distance = 9256.00
+Generation  700: Best distance = 9256.00
+Generation  800: Best distance = 9256.00
+Generation  900: Best distance = 9256.00
+Generation  999: Best distance = 9256.00
+Execução 4 concluída.
+Starting genetic algorithm with 400 paths for 1000 generations...
+Problem size: 52 cities
+--------------------------------------------------
+Generation    0: Best distance = 23492.00
+Generation  100: Best distance = 9868.00
+Generation  200: Best distance = 9799.00
+Generation  300: Best distance = 9799.00
+Generation  400: Best distance = 9799.00
+Generation  500: Best distance = 9799.00
+Generation  600: Best distance = 9787.00
+Generation  700: Best distance = 9742.00
+Generation  800: Best distance = 9742.00
+Generation  900: Best distance = 9742.00
+Generation  999: Best distance = 9742.00
+Execução 5 concluída.
+
+========================================
+INDICADORES PARA O CURRÍCULO
+========================================
+Distância Média: 9123.40
+Melhor Distância Encontrada: 8166.00
+Tempo Médio de Execução: 20.93s
+Gap Médio em relação ao Ótimo: 20.97%
+Melhora Média sobre Baseline (Prim): 12.29%
+========================================
+Métricas salvas em 'metricas_curriculo.csv'
